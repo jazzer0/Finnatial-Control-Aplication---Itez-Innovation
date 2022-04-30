@@ -8,13 +8,12 @@ function VerifyToken(req: Request, res: Response, next: NextFunction) {
 
   try {
     const user = jwt.verify(token, process.env.ACCESS_TOKEN_SECRET as Secret);
-    // req.user = user;
+    res.locals.user = user;
+    next();
   } catch (error) {
     console.log(error);
     return res.sendStatus(403);
   }
-
-  next();
 }
 
 export default VerifyToken;
