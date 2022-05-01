@@ -2,7 +2,7 @@ import IUser from "./IUser";
 
 interface ITransactions {
   id: string;
-  gastoNome: string;
+  areaDeGasto: string;
   value: number;
   transactionType: string;
   User?: IUser;

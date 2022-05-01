@@ -4,6 +4,7 @@ enum ROUTES {
   LOGOUT = "/logout",
   TRANSACTIONS = "/transactions/:id?",
   TOKEN = "/token",
+  EXTRATO = "/extrato",
 }
 
 export default ROUTES;

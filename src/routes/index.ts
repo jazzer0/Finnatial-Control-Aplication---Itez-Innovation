@@ -1,9 +1,10 @@
 import express from "express";
 import ROUTES from "../constants/routes";
 import AuthController from "../controllers/authController";
-import transactionsController from "../controllers/transactionsController";
+import TransactionsController from "../controllers/transactionsController";
 import VerifyToken from "../middleware/VerifyToken";
 
+const transactionsController = new TransactionsController();
 const router = express.Router();
 const authController = new AuthController();
 
@@ -17,5 +18,6 @@ router
   .post(transactionsController.create)
   .put(transactionsController.edit)
   .delete(transactionsController.delete);
+router.route(ROUTES.EXTRATO).get(transactionsController.extrato);
 
 export default router;

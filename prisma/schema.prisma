@@ -20,7 +20,7 @@ model User {
 
 model Transactions {
   id              String  @id @unique @default(uuid())
-  gastoNome       String
+  areaDeGasto     String?
   description     String?
   value           Float
   transactionType String

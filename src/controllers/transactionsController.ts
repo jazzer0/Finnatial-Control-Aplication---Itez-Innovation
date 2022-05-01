@@ -9,16 +9,40 @@ class TransactionsController {
 
   async create(req: Request, res: Response) {
     const data = {
-      gastoNome: req.body.gastoNome,
-      value: req.body.value,
-      transactionType: req.body.transactionType,
+      areaDeGasto: req.body.areaDeGasto?.toLowerCase(),
+      value: Math.abs(req.body.value),
+      transactionType: req.body.transactionType?.toLowerCase(),
       userId: req.body.userId,
       description: req.body.description,
     };
+    if (
+      data.areaDeGasto &&
+      ![
+        "entretenimento",
+        "alimentação",
+        "educação",
+        "saúde",
+        "transporte",
+      ].includes(data.areaDeGasto)
+    ) {
+      return res.status(400).json({
+        error: true,
+        message:
+          "Área de Gasto inválida.Áreas válidas: [entretenimento,alimentação,educação,saúde e transporte]",
+      });
+    }
+
+    if (!["gasto", "ganho"].includes(data.transactionType)) {
+      return res.status(400).json({
+        error: true,
+        message: "Tipo de transação inválida.Tipos válidos: [gasto,ganho]",
+      });
+    }
+
     try {
       await prismaClient.transactions.create({
         data: {
-          gastoNome: data.gastoNome,
+          areaDeGasto: data.areaDeGasto,
           value: data.value,
           transactionType: data.transactionType,
           userId: data.userId,
@@ -37,11 +61,33 @@ class TransactionsController {
   async edit(req: Request, res: Response) {
     const transactionsId = req.params.id;
     const data = {
-      gastoNome: req.body.gastoNome,
-      value: req.body.value,
+      areaDeGasto: req.body.areaDeGasto,
+      value: Math.abs(req.body.value),
       transactionType: req.body.transactionType,
       description: req.body.description,
     };
+    if (
+      ![
+        "entretenimento",
+        "alimentação",
+        "educação",
+        "saúde",
+        "transporte",
+      ].includes(data.areaDeGasto)
+    ) {
+      return res.status(400).json({
+        error: true,
+        message:
+          "Área de Gasto inválida.Áreas válidas: [entretenimento,alimentação,educação,saúde e transporte]",
+      });
+    }
+
+    if (!["gasto", "ganho"].includes(data.transactionType)) {
+      return res.status(400).json({
+        error: true,
+        message: "Tipo de transação inválida.Tipos válidos: [gasto,ganho]",
+      });
+    }
 
     try {
       await prismaClient.transactions.update({
@@ -82,6 +128,35 @@ class TransactionsController {
       });
     }
   }
+
+  async extrato(_req: Request, res: Response) {
+    const transactions = await prismaClient.transactions.findMany();
+    let saldo = 0,
+      ganhos = 0,
+      gastosTotais = 0;
+
+    let registroGastos: any = [];
+
+    transactions.forEach((transactions) => {
+      if (transactions.transactionType === "ganho") {
+        ganhos += transactions.value;
+        saldo += transactions.value;
+      } else {
+        registroGastos.push({
+          "Tipo de Gasto": transactions.areaDeGasto,
+          Valor: transactions.value,
+        });
+        gastosTotais += transactions.value;
+        saldo -= transactions.value;
+      }
+    });
+    return res.status(200).json({
+      saldo,
+      ganhos,
+      gastosTotais,
+      registroGastos,
+    });
+  }
 }
 
-export default new TransactionsController();
+export default TransactionsController;
