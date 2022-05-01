@@ -2,7 +2,7 @@ enum ROUTES {
   LOGIN = "/login",
   REGISTER = "/register",
   LOGOUT = "/logout",
-  TRANSACTIONS = "/transactions",
+  TRANSACTIONS = "/transactions/:id?",
   TOKEN = "/token",
 }
 
